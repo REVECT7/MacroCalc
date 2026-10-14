@@ -1,9 +1,9 @@
-const CACHE_NAME = 'macrocalc-v1.0.2';
+const CACHE_NAME = 'macrocalc-v2.0.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css',
-  './app.js',
+  './style.css?v=2.0.0',
+  './app.js?v=2.0.0',
   './manifest.json',
   './icon.svg',
   './icon-192.png',
@@ -11,16 +11,17 @@ const ASSETS_TO_CACHE = [
   './apple-touch-icon.png'
 ];
 
-// Install: Cache core application assets
+// Install: Cache core application assets and activate immediately
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
-// Activate: Clean up older caches if version bumps
+// Activate: Purge ALL previous caches when version updates
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -35,27 +36,24 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: Cache-first strategy for instant offline responsiveness
+// Fetch: Network-first strategy for instant real-time updates with offline fallback
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Return cached asset, fetch fresh version in background
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse);
-            });
-          }
-        }).catch(() => {
-          // Offline, ignore fetch failure
-        });
-        return cachedResponse;
-      }
-      return fetch(event.request);
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        // When offline or network fails, serve immediately from cache
+        return caches.match(event.request);
+      })
   );
 });
