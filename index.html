@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>MacroCalc — Nährwert-Umrechner</title>
+  
+  <!-- Responsive Viewport with iOS Notch Support -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Extrem schlanke, performante Web-App zur Nährwert-Umrechnung für Lebensmittel nach individuellem Nettogewicht.">
+
+  <!-- PWA & Apple iOS Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MacroCalc">
+  <meta name="theme-color" content="#090d16">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- Icons & Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-box">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="app-title">MacroCalc</h1>
+          <p class="app-subtitle">Nährwert-Umrechner pro Nettogewicht</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="pwa-badge" id="offlineStatusBadge" title="Offline betriebsbereit">PWA • 100% Offline</span>
+      </div>
+    </header>
+
+    <main class="calculator-card">
+      <form id="calcForm" novalidate autocomplete="off">
+        <!-- Nettogewicht Input -->
+        <div class="input-group highlight-group">
+          <label for="weightInput" class="input-label">
+            <span class="label-icon-wrapper weight-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              </svg>
+            </span>
+            <span>Nettogewicht der Portion</span>
+          </label>
+          <div class="input-field-wrap">
+            <input 
+              id="weightInput" 
+              type="text" 
+              inputmode="decimal" 
+              placeholder="z. B. 239" 
+              class="form-control main-input" 
+              required
+              aria-describedby="weightUnit"
+            >
+            <span class="input-suffix" id="weightUnit">Gramm (g)</span>
+          </div>
+          <span class="error-hint" id="weightError">Bitte ein gültiges Nettogewicht eingeben.</span>
+        </div>
+
+        <div class="divider">
+          <span>Werte pro 100 Gramm</span>
+        </div>
+
+        <!-- 100g Nutrition Grid -->
+        <div class="macros-grid">
+          <!-- Kalorien -->
+          <div class="input-group">
+            <label for="kcalInput" class="input-label">
+              <span class="label-icon-wrapper kcal-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                </svg>
+              </span>
+              <span>Kalorien (kcal)</span>
+            </label>
+            <div class="input-field-wrap">
+              <input 
+                id="kcalInput" 
+                type="text" 
+                inputmode="decimal" 
+                placeholder="0" 
+                class="form-control"
+              >
+              <span class="input-suffix">kcal</span>
+            </div>
+          </div>
+
+          <!-- Fett -->
+          <div class="input-group">
+            <label for="fatInput" class="input-label">
+              <span class="label-icon-wrapper fat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                </svg>
+              </span>
+              <span>Fett</span>
+            </label>
+            <div class="input-field-wrap">
+              <input 
+                id="fatInput" 
+                type="text" 
+                inputmode="decimal" 
+                placeholder="0.0" 
+                class="form-control"
+              >
+              <span class="input-suffix">g</span>
+            </div>
+          </div>
+
+          <!-- Kohlenhydrate -->
+          <div class="input-group">
+            <label for="carbsInput" class="input-label">
+              <span class="label-icon-wrapper carbs-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M2 22 12 2l10 20H2z"/>
+                  <path d="M6 18h12"/>
+                  <path d="M9 12h6"/>
+                </svg>
+              </span>
+              <span>Kohlenhydrate</span>
+            </label>
+            <div class="input-field-wrap">
+              <input 
+                id="carbsInput" 
+                type="text" 
+                inputmode="decimal" 
+                placeholder="0.0" 
+                class="form-control"
+              >
+              <span class="input-suffix">g</span>
+            </div>
+          </div>
+
+          <!-- Eiweiß -->
+          <div class="input-group">
+            <label for="proteinInput" class="input-label">
+              <span class="label-icon-wrapper protein-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 16.5 9 14l2 2 3-3-2-2 2.5-3L18 9"/>
+                  <circle cx="18" cy="6" r="3"/>
+                  <path d="M3 21l3-3"/>
+                </svg>
+              </span>
+              <span>Eiweiß</span>
+            </label>
+            <div class="input-field-wrap">
+              <input 
+                id="proteinInput" 
+                type="text" 
+                inputmode="decimal" 
+                placeholder="0.0" 
+                class="form-control"
+              >
+              <span class="input-suffix">g</span>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <button type="submit" id="calculateBtn" class="btn btn-primary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>Nährwerte berechnen</span>
+          </button>
+          
+          <button type="button" id="resetBtn" class="btn btn-secondary" title="Alle Eingaben leeren">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+            <span>Zurücksetzen</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Result Area (Clean Slide & Fade Animation) -->
+      <section id="resultSection" class="result-section hidden" aria-live="polite">
+        <div class="result-header">
+          <div class="result-title-group">
+            <h2 class="result-title">Berechnete Nährwerte</h2>
+            <span class="result-badge" id="resultWeightSummary">für 239g</span>
+          </div>
+          <button type="button" id="copyAllBtn" class="btn btn-copy-all" title="Alle Werte kopieren">
+            <svg class="btn-icon copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            <svg class="btn-icon check-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span class="btn-text">Alle Makros kopieren</span>
+          </button>
+        </div>
+
+        <!-- Result Cards Grid -->
+        <div class="result-grid">
+          <!-- Kalorien Card -->
+          <div class="result-card kcal-card">
+            <div class="result-meta">
+              <span class="result-tag tag-kcal">Kalorien</span>
+              <button type="button" class="btn-copy-single" data-copy-target="resKcalVal" data-copy-suffix="kcal" title="Kalorien kopieren">
+                <svg class="btn-icon copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <svg class="btn-icon check-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span class="copy-label">Kopieren</span>
+              </button>
+            </div>
+            <div class="result-value-wrap">
+              <span class="result-value" id="resKcalVal">0</span>
+              <span class="result-unit">kcal</span>
+            </div>
+          </div>
+
+          <!-- Fett Card -->
+          <div class="result-card fat-card">
+            <div class="result-meta">
+              <span class="result-tag tag-fat">Fett</span>
+              <button type="button" class="btn-copy-single" data-copy-target="resFatVal" data-copy-suffix="g F" title="Fett kopieren">
+                <svg class="btn-icon copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <svg class="btn-icon check-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span class="copy-label">Kopieren</span>
+              </button>
+            </div>
+            <div class="result-value-wrap">
+              <span class="result-value" id="resFatVal">0.0</span>
+              <span class="result-unit">g</span>
+            </div>
+          </div>
+
+          <!-- Kohlenhydrate Card -->
+          <div class="result-card carbs-card">
+            <div class="result-meta">
+              <span class="result-tag tag-carbs">Kohlenhydrate</span>
+              <button type="button" class="btn-copy-single" data-copy-target="resCarbsVal" data-copy-suffix="g KH" title="Kohlenhydrate kopieren">
+                <svg class="btn-icon copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <svg class="btn-icon check-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span class="copy-label">Kopieren</span>
+              </button>
+            </div>
+            <div class="result-value-wrap">
+              <span class="result-value" id="resCarbsVal">0.0</span>
+              <span class="result-unit">g</span>
+            </div>
+          </div>
+
+          <!-- Eiweiß Card -->
+          <div class="result-card protein-card">
+            <div class="result-meta">
+              <span class="result-tag tag-protein">Eiweiß</span>
+              <button type="button" class="btn-copy-single" data-copy-target="resProteinVal" data-copy-suffix="g E" title="Eiweiß kopieren">
+                <svg class="btn-icon copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                <svg class="btn-icon check-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span class="copy-label">Kopieren</span>
+              </button>
+            </div>
+            <div class="result-value-wrap">
+              <span class="result-value" id="resProteinVal">0.0</span>
+              <span class="result-unit">g</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Macro Distribution Visual Bar -->
+        <div class="macro-distribution">
+          <div class="distribution-header">
+            <span>Makro-Verteilung</span>
+            <span id="distributionSummary">F 0% • KH 0% • E 0%</span>
+          </div>
+          <div class="distribution-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <div id="barFat" class="bar-segment seg-fat" style="width: 0%" title="Fett"></div>
+            <div id="barCarbs" class="bar-segment seg-carbs" style="width: 0%" title="Kohlenhydrate"></div>
+            <div id="barProtein" class="bar-segment seg-protein" style="width: 0%" title="Eiweiß"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- iOS PWA Quick Tip -->
+      <footer class="ios-install-hint" id="iosHint">
+        <svg class="hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+        <span>Auf iOS: In Safari auf <strong>Teilen</strong> tippen und <strong>„Zum Home-Bildschirm“</strong> wählen.</span>
+      </footer>
+    </main>
+
+    <!-- Toast Notification for Copy / Errors -->
+    <div id="toastNotification" class="toast-notification hidden" role="status" aria-live="polite">
+      <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span id="toastMessage">In Zwischenablage kopiert!</span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

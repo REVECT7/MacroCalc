@@ -1,0 +1,12 @@
+services:
+  macrocalc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: macrocalc-pwa
+    ports:
+      # Port-Mapping: Host 777 -> Container 80 (über Umgebungsvariable PORT überschreibbar)
+      - "${PORT:-777}:80"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Berlin

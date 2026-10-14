@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="50%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#10b981" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background with subtle border -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  <rect x="4" y="4" width="504" height="504" rx="108" fill="none" stroke="#334155" stroke-width="6" stroke-opacity="0.6"/>
+
+  <!-- Glowing outer circle accent -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#accentGrad)" stroke-width="4" stroke-opacity="0.25" stroke-dasharray="8 8"/>
+
+  <!-- Main Emblem: Stylized Macro Chart / Scale & "M" -->
+  <g filter="url(#shadow)">
+    <!-- Scale Base / Energy Spark -->
+    <path d="M160 380 L352 380" stroke="url(#accentGrad)" stroke-width="18" stroke-linecap="round"/>
+    <path d="M256 380 L256 160" stroke="url(#accentGrad)" stroke-width="18" stroke-linecap="round"/>
+    
+    <!-- Balance Bar -->
+    <path d="M130 180 L382 180" stroke="url(#accentGrad)" stroke-width="16" stroke-linecap="round"/>
+    
+    <!-- Scale Pans (Left & Right) -->
+    <path d="M130 180 L100 270 L160 270 Z" fill="url(#accentGrad)" opacity="0.9"/>
+    <path d="M382 180 L352 270 L412 270 Z" fill="url(#accentGrad)" opacity="0.9"/>
+
+    <!-- Center Nutrition Flame / Spark -->
+    <path d="M256 100 C272 135 292 155 282 175 C274 190 256 195 256 195 C256 195 238 190 230 175 C220 155 240 135 256 100 Z" fill="url(#glowGrad)"/>
+  </g>
+
+  <!-- Stylized "M" Overlay at Center Bottom -->
+  <text x="256" y="350" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="76" font-weight="900" fill="#f8fafc" text-anchor="middle" letter-spacing="2">MC</text>
+</svg>
