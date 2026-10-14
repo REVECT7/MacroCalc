@@ -17,6 +17,7 @@ COPY icon.svg /usr/share/nginx/html/
 COPY icon-192.png /usr/share/nginx/html/
 COPY icon-512.png /usr/share/nginx/html/
 COPY apple-touch-icon.png /usr/share/nginx/html/
+COPY tesseract.min.js /usr/share/nginx/html/
 
 # Expose standard HTTP port
 EXPOSE 80

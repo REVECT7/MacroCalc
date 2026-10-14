@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
-  <link rel="stylesheet" href="style.css?v=2.0.0">
+  <link rel="stylesheet" href="style.css?v=2.2.0">
 </head>
 <body>
   <div class="app-wrapper">
@@ -75,8 +75,55 @@
           <span class="error-hint" id="weightError">Bitte ein gültiges Nettogewicht eingeben.</span>
         </div>
 
-        <div class="divider">
-          <span>Werte pro 100 Gramm</span>
+        <!-- Section Header with Camera Scan Button -->
+        <div class="section-header-bar">
+          <div class="divider-line"></div>
+          <div class="section-header-inner">
+            <span class="section-title">Werte pro 100 Gramm</span>
+            <button type="button" id="cameraScanBtn" class="btn-scan" title="Nährwerttabelle per Kamera / Foto scannen">
+              <svg class="scan-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              <span>Foto scannen</span>
+            </button>
+          </div>
+          <div class="divider-line"></div>
+        </div>
+
+        <!-- Hidden Camera Input for iPhone & Mobile -->
+        <input type="file" id="cameraFileInput" accept="image/*" capture="environment" class="hidden">
+
+        <!-- Scanning Status Card (Shown while OCR is running) -->
+        <div id="scanStatusCard" class="scan-status-card hidden">
+          <div class="scan-status-main">
+            <div class="scan-radar-icon">
+              <div class="scan-spinner"></div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+            <div class="scan-status-info">
+              <span class="scan-status-title">Nährwert-Foto wird analysiert</span>
+              <span id="scanStatusText" class="scan-status-text">Initialisiere Texterkennung...</span>
+            </div>
+          </div>
+          <div class="scan-progress-track">
+            <div id="scanProgressFill" class="scan-progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Scan Result Details & OCR Text Drawer -->
+        <div id="scanResultDetails" class="scan-result-details hidden">
+          <div class="scan-result-summary">
+            <span id="scanResultSummaryText"></span>
+            <button type="button" id="toggleOcrTextBtn" class="btn-text-toggle">Erkannten Text prüfen ▾</button>
+          </div>
+          <div id="ocrTextDrawer" class="ocr-text-drawer hidden">
+            <p class="ocr-drawer-title">Von OCR erkannter Text aus dem Foto:</p>
+            <pre id="rawOcrTextPre" class="ocr-raw-text"></pre>
+          </div>
         </div>
 
         <!-- 100g Nutrition Grid -->
@@ -324,8 +371,96 @@
       </svg>
       <span id="toastMessage">In Zwischenablage kopiert!</span>
     </div>
+
+    <!-- Camera Crop & Scan Modal -->
+    <div id="cropScanModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cropModalTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <svg class="modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"/>
+              <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"/>
+            </svg>
+            <h3 id="cropModalTitle" class="modal-title">Nährwerttabelle auswählen</h3>
+          </div>
+          <button type="button" id="closeCropModalBtn" class="modal-close-btn" title="Schließen">&times;</button>
+        </div>
+
+        <p class="modal-subtitle">Rahmen über die Nährwerttabelle ziehen, um Barcodes & störenden Text auszuschließen.</p>
+
+        <!-- Viewport Container with Crop Box -->
+        <div class="crop-viewport-wrap" id="cropViewportWrap">
+          <canvas id="cropCanvas"></canvas>
+          <div id="cropBox" class="crop-box">
+            <div class="crop-handle handle-nw" data-handle="nw"></div>
+            <div class="crop-handle handle-ne" data-handle="ne"></div>
+            <div class="crop-handle handle-sw" data-handle="sw"></div>
+            <div class="crop-handle handle-se" data-handle="se"></div>
+          </div>
+        </div>
+
+        <!-- Progress overlay inside modal while scanning -->
+        <div id="modalScanProgress" class="modal-scan-progress hidden">
+          <div class="modal-spinner"></div>
+          <span id="modalScanText">Analysiere Nährwerte...</span>
+          <div class="scan-progress-track">
+            <div id="modalProgressFill" class="scan-progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Recognition Confirmation View (Shown when OCR finishes) -->
+        <div id="modalReviewView" class="modal-review-view hidden">
+          <h4 class="review-title">Gefundene Nährwerte pro 100g:</h4>
+          <div class="review-grid">
+            <div class="review-item">
+              <label for="reviewKcal">Kalorien (kcal)</label>
+              <input type="text" id="reviewKcal" inputmode="decimal" class="form-control review-input" placeholder="0">
+            </div>
+            <div class="review-item">
+              <label for="reviewFat">Fett (g)</label>
+              <input type="text" id="reviewFat" inputmode="decimal" class="form-control review-input" placeholder="0.0">
+            </div>
+            <div class="review-item">
+              <label for="reviewCarbs">Kohlenhydrate (g)</label>
+              <input type="text" id="reviewCarbs" inputmode="decimal" class="form-control review-input" placeholder="0.0">
+            </div>
+            <div class="review-item">
+              <label for="reviewProtein">Eiweiß (g)</label>
+              <input type="text" id="reviewProtein" inputmode="decimal" class="form-control review-input" placeholder="0.0">
+            </div>
+          </div>
+
+          <!-- Raw text toggle inside modal -->
+          <button type="button" id="modalToggleRawText" class="btn-text-toggle">Gelesenen Rohtext prüfen ▾</button>
+          <pre id="modalRawTextPre" class="ocr-raw-text hidden"></pre>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="modal-actions" id="cropModalInitialActions">
+          <button type="button" id="cropScanConfirmBtn" class="btn btn-primary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span>Auswahl scannen</span>
+          </button>
+          <button type="button" id="cropScanFullBtn" class="btn btn-secondary">Ganzes Foto</button>
+        </div>
+
+        <div class="modal-actions hidden" id="cropModalReviewActions">
+          <button type="button" id="applyReviewBtn" class="btn btn-primary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Werte in MacroCalc übernehmen</span>
+          </button>
+          <button type="button" id="retryCropBtn" class="btn btn-secondary">Neu zuschneiden</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script src="app.js?v=2.0.0"></script>
+  <script src="tesseract.min.js?v=2.2.0" defer></script>
+  <script src="app.js?v=2.2.0" defer></script>
 </body>
 </html>

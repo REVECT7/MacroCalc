@@ -6,7 +6,13 @@ Eine extrem leichtgewichtige, performante Web-App zur präzisen Nährwert-Umrech
 
 ## ✨ Features
 
-- **⚡ Schnell & Schlank:** Pure Vanilla HTML5, modernstes CSS im Dark-Mode-Design (Slate/Zinc mit Smaragdgrün-Akzenten) und Vanilla JavaScript. Keine schweren Frameworks, keine externen CDN-Abhängigkeiten.
+- **📸 Smarter Kamera-Scanner (OCR) mit Zuschnitt:**
+  - Nährwerttabelle direkt mit der Smartphone-Kamera abfotografieren oder Bild auswählen.
+  - Interaktiver Zuschnitt-Rahmen (Crop-Tool): Einfaches Auswählen der Nährwerttabelle per Touch/Maus – Barcodes und Randtext werden sofort ausgeblendet.
+  - Bild-Vorverarbeitung: Automatisches Upscaling, Kontrast-Spreizung und Gitterlinien-Filter im Canvas für maximale Erkennungsgenauigkeit.
+  - Liest gezielt nur Kalorien, Fett, Kohlenhydrate und Eiweiß (ignoriert Unterzeilen wie gesättigte Fettsäuren, Zucker, Ballaststoffe und Salz).
+  - Übersichtlicher Review-Dialog zur Kontrolle und manuellen Feinjustierung vor der Übernahme ins Formular.
+- **⚡ Schnell & Schlank:** Pure Vanilla HTML5, modernstes CSS im Dark-Mode-Design (Slate/Zinc mit Smaragdgrün-Akzenten) und Vanilla JavaScript. Keine schweren Frameworks.
 - **📱 iOS-First PWA:**
   - Standalone App-Modus ohne Browserleiste (`apple-mobile-web-app-capable`).
   - Angepasste Statusleiste (`black-translucent`) und Berücksichtigung von iPhone Safe-Area-Insets (Notch & Dynamic Island).
@@ -32,7 +38,7 @@ Eine extrem leichtgewichtige, performante Web-App zur präzisen Nährwert-Umrech
 ### 1. Starten via Docker Compose
 Im Projektverzeichnis ausführen:
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 Die App ist sofort erreichbar unter:
@@ -67,16 +73,17 @@ docker compose down
 
 ```text
 NW-Tracker/
-├── index.html           # Semantisches HTML5, iOS Meta-Tags, barrierefreie Inputs
-├── style.css            # Modernes Dark-Mode CSS mit Safe-Area & Micro-Animations
-├── app.js               # Berechnungs-Engine, Input-Parser, Clipboard-API & PWA-Worker
-├── sw.js                # Service Worker für Offline-Caching
+├── index.html           # Semantisches HTML5, iOS Meta-Tags, Crop-Modal & Review-View
+├── style.css            # Dark-Mode CSS mit Safe-Area, Crop-Overlay & Micro-Animations
+├── app.js               # Berechnungs-Engine, Touch-Crop, Bildfilter, OCR-Parser & PWA-Worker
+├── sw.js                # Service Worker für Offline-Caching (Network-First)
 ├── manifest.json        # PWA Web-App-Manifest (Standalone, Icons, Theme-Color)
+├── tesseract.min.js     # Lokale Tesseract.js OCR Client-Bibliothek
 ├── icon.svg             # Vektorbasiertes PWA-Icon
 ├── icon-192.png         # PWA Icon 192x192
 ├── icon-512.png         # PWA Icon 512x512
 ├── apple-touch-icon.png # iOS Homescreen Icon (180x180)
-├── nginx.conf           # Schlanke Nginx-Konfiguration mit Gzip & Sicherheitsheadern
-├── Dockerfile           # Alpine-basiertes Multi-Container Image (< 20 MB)
+├── nginx.conf           # Schlanke Nginx-Konfiguration mit Gzip, Caching-Policy & Security-Headern
+├── Dockerfile           # Alpine-basiertes Multi-Container Image (< 25 MB)
 └── docker-compose.yml   # Port-Mapping 777:80 & Restart-Policy unless-stopped
 ```

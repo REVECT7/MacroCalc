@@ -1,9 +1,10 @@
-const CACHE_NAME = 'macrocalc-v2.0.0';
+const CACHE_NAME = 'macrocalc-v2.2.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css?v=2.0.0',
-  './app.js?v=2.0.0',
+  './style.css?v=2.2.0',
+  './app.js?v=2.2.0',
+  './tesseract.min.js?v=2.2.0',
   './manifest.json',
   './icon.svg',
   './icon-192.png',
